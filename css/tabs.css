@@ -1,0 +1,45 @@
+.tabs {
+    list-style-type: none;
+    margin: 30px 0 0 0;
+    padding: 0 0 2em 0;
+}
+li.tabsLiElement {
+    margin-right: 35px;
+}
+.tabs a {
+    padding: 0.3em;
+    text-decoration: none;
+}
+.tabs li a:hover {
+    background-color: #2979BC;
+}
+.tabs .selected {
+    text-decoration: underline;
+}
+.tabContent {
+    padding-top: 50px;
+}
+.tabContentHide {
+    display: none;
+}
+.tabLoading {
+    background: url('../img/preloader.gif') no-repeat center center;
+}
+.inactiveLink {
+    color: gray;
+    pointer-events: none;
+    cursor: default;
+    background-color: transparent;
+}
+.tabDropdownHide ul{
+    display: none;
+}
+.dropdownShow ul{
+    display: block;
+}
+.ulHide {
+    display: none;
+}
+.ulShow {
+    display: block;
+}
