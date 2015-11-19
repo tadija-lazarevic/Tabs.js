@@ -9,6 +9,7 @@ var Tabs = (function () {
         tabContentArray = [],
         tabLinksArray   = [],
         tabLIArray      = [],
+        idPostfix       = 'ID',
         tabLIElement,
         aTag,
         pageLink,
@@ -28,13 +29,18 @@ var Tabs = (function () {
 
     // Create tabs
     method.Init = function (parameters) {
-        settings.appendTo   = parameters.appendTo || defaultSettings.appendTo;
-        settings.before     = parameters.before || defaultSettings.before;
-        settings.position   = parameters.position || defaultSettings.position;
-        settings.defaultTab = parameters.defaultTab || defaultSettings.defaultTab;
-        settings.display    = parameters.display || defaultSettings.display;
-        settings.tabs       = parameters.tabs || defaultSettings.tabs;
-        settings.tabsLength = parameters.tabs.length || defaultSettings.tabs.length;
+        settings.appendTo    = parameters.appendTo || defaultSettings.appendTo;
+        settings.before      = parameters.before || defaultSettings.before;
+        settings.position    = parameters.position || defaultSettings.position;
+        settings.defaultTab  = parameters.defaultTab || defaultSettings.defaultTab;
+        settings.display     = parameters.display || defaultSettings.display;
+        settings.showHTMLOn  = parameters.showHTMLOn || defaultSettings.showHTMLOn;
+        settings.showULOn    = parameters.showULOn || defaultSettings.showULOn;
+        settings.hideULOn    = parameters.hideULOn || defaultSettings.hideULOn;
+        settings.showChildOn = parameters.showChildOn || defaultSettings.showChildOn;
+        settings.tabs        = parameters.tabs || defaultSettings.tabs;
+        settings.tabsLength  = parameters.tabs.length || defaultSettings.tabs.length;
+
 
         // If there is tabs
         if (settings.tabsLength > 0) {
@@ -74,6 +80,7 @@ var Tabs = (function () {
 
             // Creates LI element and appends href
             tabLIElement = document.createElement('LI');
+            tabLIElement.setAttribute('id', settings.tabs[i].label + idPostfix);
             tabLIElement.appendChild(aHref);
 
             // Appends li elements to UL
@@ -96,16 +103,13 @@ var Tabs = (function () {
         tabLinksArray[pageLink] = aTag;
         currentTab.content ? tabContentArray[pageLink] = tabContent : false;
 
-        // On Tab Switch
+        // On tab action
         if (tabLinksArray.hasOwnProperty(currentTab.label)) {
             if (currentTab.content) {
-                tabLinksArray[currentTab.label].onmousedown = method.ShowHTMLContent;
+                Utils.GetElementID(currentTab.label + idPostfix).addEventListener(settings.showHTMLOn, method.ShowHTMLContent);
             }
             else if (currentTab.isUL) {
-                tabLinksArray[currentTab.label].onmouseover = method.ShowULContent;
-                tabLinksArray[currentTab.label].onmousedown = function () {
-                    Utils.AddClass(Utils.GetElementID(this.innerHTML), 'tabDropdownHide');
-                };
+                Utils.GetElementID(currentTab.label + idPostfix).addEventListener(settings.showULOn, method.ShowULContent);
             }
         }
 
@@ -133,7 +137,6 @@ var Tabs = (function () {
                 }
             }
         }
-        return false;
     };
 
     // Show content of ul tab
@@ -146,8 +149,15 @@ var Tabs = (function () {
                     liChildes    = mainUL.getElementsByTagName('li'),
                     currentChild = {};
 
-                Utils.RemoveClassWithName(mainUL, 'tabDropdownHide');
-                Utils.AddClass(mainUL, 'tabDropdownShow');
+                var toogle = Utils.HasClass(mainUL, 'tabDropdownHide') ? true : false;
+                if (toogle) {
+                    Utils.RemoveClassWithName(mainUL, 'tabDropdownHide');
+                    Utils.AddClass(mainUL, 'tabDropdownShow');
+                }
+                else if (!toogle) {
+                    Utils.RemoveClassWithName(mainUL, 'tabDropdownShow');
+                    Utils.AddClass(mainUL, 'tabDropdownHide');
+                }
 
                 // Check for child elements of li
                 for (var i = 0; i < liChildes.length; i++) {
@@ -156,7 +166,7 @@ var Tabs = (function () {
 
                     if (currentChildUL) {
                         Utils.AddClass(currentChildUL, 'ulHide');
-                        currentChild.onmousedown = function () {
+                        currentChild.addEventListener(settings.showChildOn, function () {
                             var childToogle = Utils.HasClass(this.firstElementChild, 'ulHide') ? true : false;
                             if (childToogle) {
                                 Utils.RemoveClassWithName(this.firstElementChild, 'ulHide');
@@ -166,7 +176,7 @@ var Tabs = (function () {
                                 Utils.RemoveClassWithName(this.firstElementChild, 'ulShow');
                                 Utils.AddClass(this.firstElementChild, 'ulHide');
                             }
-                        }
+                        });
                     }
                 }
             }
