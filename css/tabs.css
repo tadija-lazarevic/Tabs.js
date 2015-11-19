@@ -43,3 +43,8 @@ li.tabsLiElement {
 .ulShow {
     display: block;
 }
+.separator {
+    border-top:solid 1px #CACF75;
+    padding-top:1px;
+    height:	1px;
+}

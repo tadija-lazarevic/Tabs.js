@@ -11,15 +11,15 @@ function MainInit() {
     Tabs.Init({
         appendTo  : appendTo,
         before    : appendTo.childNodes[0],
+        // If default tab is not present all tabs content will be hidden and showed upon tab click
         defaultTab: 'audio',
         position  : 'relative',
-        display   : 'block',
+        display   : 'inline',
         tabs      : [
             {
                 label  : 'status',
                 href   : '#status',
                 content: statusContent
-
             },
             {
                 label   : 'photos',

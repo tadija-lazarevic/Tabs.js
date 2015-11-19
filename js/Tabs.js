@@ -14,7 +14,6 @@ var Tabs = (function () {
         pageLink,
         currentTab,
         tabIndex,
-        mainUL,
 
 
         defaultSettings = {
@@ -23,14 +22,7 @@ var Tabs = (function () {
             position  : 'fixed',
             defaultTab: '',
             display   : 'block',
-            tabs      : [
-                {
-                    label   : 'ExampleTab',
-                    href    : '#exampletab',
-                    content : '<h1>This is example tab</h1>',
-                    inactive: true
-                }
-            ]
+            tabs      : []
         };
 
 
@@ -47,14 +39,15 @@ var Tabs = (function () {
         // If there is tabs
         if (settings.tabsLength > 0) {
             method.CreateLinks();
+
             for (var i = 0; i < settings.tabsLength; i++) {
                 currentTab = settings.tabs[i];
                 tabIndex   = i;
                 if ((currentTab.content || currentTab.isUL) && !currentTab.ajaxContent) {
-                    method.GetHTMLContent(tabIndex, currentTab.content, currentTab.href);
+                    method.GetContent(tabIndex, currentTab.content, currentTab.href);
                 }
                 else if (currentTab.ajaxContent && !currentTab.content) {
-                    //TODO implement ajax call
+
                 }
                 // Set style for single tab
                 method.SetTabStyle();
@@ -93,7 +86,7 @@ var Tabs = (function () {
     };
 
     // Called if content is html
-    method.GetHTMLContent = function (tabIndex, tabContent, href) {
+    method.GetContent = function (tabIndex, tabContent, href) {
         // Gets tabs child nodes
         tabLIArray = Utils.GetElementID('tabs').childNodes;
 
@@ -106,15 +99,12 @@ var Tabs = (function () {
         // On Tab Switch
         if (tabLinksArray.hasOwnProperty(currentTab.label)) {
             if (currentTab.content) {
-                tabLinksArray[currentTab.label].onmousedown = method.ShowTabContent;
-                tabLinksArray[currentTab.label].onfocus     = function () {
-                    this.blur();
-                };
+                tabLinksArray[currentTab.label].onmousedown = method.ShowHTMLContent;
             }
             else if (currentTab.isUL) {
-                tabLinksArray[currentTab.label].onmousedown = method.ShowULContent;
-                tabLinksArray[currentTab.label].onfocus     = function () {
-                    this.blur();
+                tabLinksArray[currentTab.label].onmouseover = method.ShowULContent;
+                tabLinksArray[currentTab.label].onmousedown = function () {
+                    Utils.AddClass(Utils.GetElementID(this.innerHTML), 'tabDropdownHide');
                 };
             }
         }
@@ -122,7 +112,7 @@ var Tabs = (function () {
     };
 
     // Show clicked tab
-    method.ShowTabContent = function () {
+    method.ShowHTMLContent = function () {
         // Gets the name of selected tab
         var selectedTab = method.ReturnSelected();
 
@@ -146,26 +136,42 @@ var Tabs = (function () {
         return false;
     };
 
-    // Get first child with tag name
-    method.GetFirstChildWithTagName = function (element, tagName) {
-        for (var i = 0; i < element.childNodes.length; i++) {
-            if (element.childNodes[i].nodeName.toLowerCase() == tagName) return element.childNodes[i];
-        }
-    };
+    // Show content of ul tab
+    method.ShowULContent = function () {
+        var selectedTab = method.ReturnSelected();
 
-    // Return clicked item
-    method.ReturnSelected = function (e) {
-        var elem,
-            evt = e ? e : event;
-        if (evt.srcElement) {
-            elem = evt.srcElement;
+        for (var id in tabLinksArray) {
+            if (id === selectedTab.selected) {
+                var mainUL       = Utils.GetElementID(selectedTab.selected),
+                    liChildes    = mainUL.getElementsByTagName('li'),
+                    currentChild = {};
+
+                Utils.RemoveClassWithName(mainUL, 'tabDropdownHide');
+                Utils.AddClass(mainUL, 'tabDropdownShow');
+
+                // Check for child elements of li
+                for (var i = 0; i < liChildes.length; i++) {
+                    currentChild       = liChildes[i];
+                    var currentChildUL = method.GetFirstChildWithTagName(currentChild, 'ul');
+
+                    if (currentChildUL) {
+                        Utils.AddClass(currentChildUL, 'ulHide');
+                        currentChild.onmousedown = function () {
+                            var childToogle = Utils.HasClass(this.firstElementChild, 'ulHide') ? true : false;
+                            if (childToogle) {
+                                Utils.RemoveClassWithName(this.firstElementChild, 'ulHide');
+                                Utils.AddClass(this.firstElementChild, 'ulShow');
+                            }
+                            else if (!childToogle) {
+                                Utils.RemoveClassWithName(this.firstElementChild, 'ulShow');
+                                Utils.AddClass(this.firstElementChild, 'ulHide');
+                            }
+                        }
+                    }
+                }
+            }
         }
-        else if (evt.target) {
-            elem = evt.target;
-        }
-        return {
-            selected: elem.innerText.toString()
-        }
+
     };
 
     // Initialize default and inactive tabs
@@ -200,55 +206,25 @@ var Tabs = (function () {
 
     };
 
-    // Show content of ul tab
-    method.ShowULContent = function () {
-        var selectedTab = method.ReturnSelected();
+    // Get first child with tag name
+    method.GetFirstChildWithTagName = function (element, tagName) {
+        for (var i = 0; i < element.childNodes.length; i++) {
+            if (element.childNodes[i].nodeName.toLowerCase() == tagName) return element.childNodes[i];
+        }
+    };
 
-        for (var id in tabLinksArray) {
-            if (id === selectedTab.selected) {
-                var mainUL           = Utils.GetElementID(selectedTab.selected),
-                    liElements       = mainUL.getElementsByTagName('li'),
-                    liElementsLength = liElements.length,
-                    childNodesList   = [],
-                    currentChild     = null;
-
-
-                var toogle = Utils.HasClass(mainUL, 'tabDropdownHide') ? true : false;
-
-                if (toogle) {
-                    Utils.RemoveClassWithName(mainUL, 'tabDropdownHide');
-                    Utils.AddClass(mainUL, 'tabDropdownShow');
-                }
-                else if (!toogle) {
-                    Utils.RemoveClassWithName(mainUL, 'tabDropdownShow');
-                    Utils.AddClass(mainUL, 'tabDropdownHide');
-                }
-                // Check for child elements of li
-                for (var i = 0; i < liElementsLength; i++) {
-                    if (liElements[i].children.length > 0) {
-                        childNodesList = liElements[i].childNodes;
-                        for (var j = 0; j < childNodesList.length; j++) {
-                            currentChild = childNodesList[j];
-                            if (currentChild.tagName === 'UL') {
-                                Utils.AddClass(currentChild, 'ulHide');
-                                currentChild.parentNode.onmousedown = function () {
-                                    var self        = this;
-                                    var childToogle = Utils.HasClass(self.firstElementChild, 'ulHide') ? true : false;
-
-                                    if (childToogle) {
-                                        Utils.RemoveClassWithName(self.firstElementChild, 'ulHide');
-                                        Utils.AddClass(self.firstElementChild, 'ulShow');
-                                    }
-                                    else if (!childToogle) {
-                                        Utils.RemoveClassWithName(self.firstElementChild, 'ulShow');
-                                        Utils.AddClass(self.firstElementChild, 'ulHide');
-                                    }
-                                };
-                            }
-                        }
-                    }
-                }
-            }
+    // Return clicked item
+    method.ReturnSelected = function (e) {
+        var elem,
+            evt = e ? e : event;
+        if (evt.srcElement) {
+            elem = evt.srcElement;
+        }
+        else if (evt.target) {
+            elem = evt.target;
+        }
+        return {
+            selected: elem.innerText
         }
     };
 
