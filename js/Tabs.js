@@ -1,21 +1,26 @@
 var Tabs = (function () {
     'use strict';
 
-    // create object method
+    // Global variables
     var method          = {},
         settings        = {},
 
-        tabULElement    = document.createElement('ul'),
-        tabContentArray = [],
+        tabULContainer  = document.createElement('ul'),
+        tabHTMLContent  = [],
+        tabULContent    = [],
         tabLinksArray   = [],
         tabLIArray      = [],
         idPostfix       = 'ID',
         tabLIElement,
         aTag,
-        pageLink,
+
+        // Tab variables
         currentTab,
         tabIndex,
-
+        tabTitle,
+        tabHref,
+        tabTitleLower,
+        tabID,
 
         defaultSettings = {
             appendTo  : document.body,
@@ -38,177 +43,175 @@ var Tabs = (function () {
         settings.showULOn    = parameters.showULOn || defaultSettings.showULOn;
         settings.hideULOn    = parameters.hideULOn || defaultSettings.hideULOn;
         settings.showChildOn = parameters.showChildOn || defaultSettings.showChildOn;
+        settings.hideChildOn = parameters.hideChildOn || defaultSettings.hideChildOn;
         settings.tabs        = parameters.tabs || defaultSettings.tabs;
         settings.tabsLength  = parameters.tabs.length || defaultSettings.tabs.length;
 
 
-        // If there is tabs
-        if (settings.tabsLength > 0) {
-            method.CreateLinks();
+        // Sets ul element with id="tabs"
+        tabULContainer.setAttribute('id', 'tabs');
 
-            for (var i = 0; i < settings.tabsLength; i++) {
-                currentTab = settings.tabs[i];
-                tabIndex   = i;
-                if ((currentTab.content || currentTab.isUL) && !currentTab.ajaxContent) {
-                    method.GetContent(tabIndex, currentTab.content, currentTab.href);
-                }
-                else if (currentTab.ajaxContent && !currentTab.content) {
+        for (var i = 0; i < settings.tabsLength; i++) {
+            currentTab    = settings.tabs[i];
+            tabIndex      = i;
+            tabTitle      = currentTab.label;
+            tabTitleLower = tabTitle.toLowerCase();
+            tabID         = tabTitleLower.replace(/\s+/g, '') + idPostfix;
+            tabHref       = currentTab.href.toLowerCase();
 
-                }
-                // Set style for single tab
-                method.SetTabStyle();
+            method.CreateLinks(tabTitle, tabHref, tabID);
+            if ((currentTab.content || currentTab.isUL) && !currentTab.ajaxContent) {
+                method.GetContent(tabID, tabIndex, tabTitleLower);
             }
-            // Set style for ul
-            tabULElement.style.position = settings.position;
-            Utils.AddClass(tabULElement, 'tabs');
-        }
+            else if (currentTab.ajaxContent && !currentTab.content) {
 
+            }
+            // Set style for single tab
+            method.SetTabStyle(tabTitle, tabTitleLower, tabID, tabIndex);
+        }
+        // Set style for ul
+
+        tabULContainer.style.position = settings.position;
+        Utils.AddClass(tabULContainer, 'tabs');
     };
 
-    // Creates ul element with tabCount li's
-    method.CreateLinks = function () {
+    // Creates ul element with li's
+    method.CreateLinks = function (tabTitle, tabHref, tabID) {
+        // Creates link attribute
+        var aHref       = document.createElement('a');
+        aHref.setAttribute('href', tabHref);
+        aHref.innerHTML = tabTitle;
 
-        // Sets ul element with id="tabs"
-        tabULElement.setAttribute('id', 'tabs');
+        // Creates LI element and appends href
+        tabLIElement = document.createElement('LI');
+        tabLIElement.setAttribute('id', tabID);
+        tabLIElement.appendChild(aHref);
 
-        // Creates tab list elements
-        for (var i = 0; i < settings.tabsLength; i++) {
-            // Set href link
-            var aHref       = document.createElement('a');
-            aHref.setAttribute('href', settings.tabs[i].href.toLowerCase());
-            aHref.innerHTML = settings.tabs[i].label;
-
-            // Creates LI element and appends href
-            tabLIElement = document.createElement('LI');
-            tabLIElement.setAttribute('id', settings.tabs[i].label + idPostfix);
-            tabLIElement.appendChild(aHref);
-
-            // Appends li elements to UL
-            tabULElement.appendChild(tabLIElement);
-        }
+        // Appends li to ul container
+        tabULContainer.appendChild(tabLIElement);
 
         // Appends Tab UL to appendTo element before settings.before element
-        settings.appendTo.insertBefore(tabULElement, settings.before);
+        settings.appendTo.insertBefore(tabULContainer, settings.before);
 
     };
 
     // Called if content is html
-    method.GetContent = function (tabIndex, tabContent, href) {
+    method.GetContent = function (tabID, tabIndex, tabTitleLower) {
         // Gets tabs child nodes
         tabLIArray = Utils.GetElementID('tabs').childNodes;
+        aTag       = method.GetFirstChildWithTagName(tabLIArray[tabIndex], 'a');
 
-        aTag     = method.GetFirstChildWithTagName(tabLIArray[tabIndex], 'a');
-        pageLink = href.substring(1).toLowerCase();
-
-        tabLinksArray[pageLink] = aTag;
-        currentTab.content ? tabContentArray[pageLink] = tabContent : false;
+        tabLinksArray[tabTitleLower] = aTag;
+        currentTab.content ? tabHTMLContent[tabTitleLower] = currentTab.content : null;
+        currentTab.isUL ? tabULContent[tabTitleLower] = currentTab.content : null;
 
         // On tab action
-        if (tabLinksArray.hasOwnProperty(currentTab.label)) {
-            if (currentTab.content) {
-                Utils.GetElementID(currentTab.label + idPostfix).addEventListener(settings.showHTMLOn, method.ShowHTMLContent);
+        if (tabLinksArray.hasOwnProperty(tabTitleLower) && !currentTab.inactive) {
+            if (!currentTab.isUL) {
+                Utils.GetElementID(tabID).addEventListener(settings.showHTMLOn, method.ShowHTMLContent);
             }
             else if (currentTab.isUL) {
-                Utils.GetElementID(currentTab.label + idPostfix).addEventListener(settings.showULOn, method.ShowULContent);
+                Utils.GetElementID(tabID).addEventListener(settings.showULOn, method.ShowULContent);
             }
         }
 
     };
 
-    // Show clicked tab
+    // Show HTML content
     method.ShowHTMLContent = function () {
         // Gets the name of selected tab
         var selectedTab = method.ReturnSelected();
 
-        for (var id in tabContentArray) {
+        for (var id in tabHTMLContent) {
             if (id === selectedTab.selected) {
-                if (tabContentArray.hasOwnProperty(id)) {
+                if (tabHTMLContent.hasOwnProperty(id)) {
                     Utils.RemoveClassAttribute(tabLinksArray[id]);
-                    Utils.RemoveClassAttribute(tabContentArray[id]);
+                    Utils.RemoveClassAttribute(tabHTMLContent[id]);
 
                     Utils.AddClass(tabLinksArray[id], 'selected');
-                    Utils.AddClass(tabContentArray[id], 'tabContent');
+                    Utils.AddClass(tabHTMLContent[id], 'tabContent');
                 }
             }
             else {
-                if (tabContentArray.hasOwnProperty(id)) {
+                if (tabHTMLContent.hasOwnProperty(id)) {
                     Utils.RemoveClassWithName(tabLinksArray[id], 'selected');
-                    Utils.AddClass(tabContentArray[id], 'tabContentHide');
+                    Utils.AddClass(tabHTMLContent[id], 'tabContentHide');
                 }
             }
         }
     };
 
-    // Show content of ul tab
+    // Show ul content
     method.ShowULContent = function () {
         var selectedTab = method.ReturnSelected();
 
-        for (var id in tabLinksArray) {
-            if (id === selectedTab.selected) {
-                var mainUL       = Utils.GetElementID(selectedTab.selected),
-                    liChildes    = mainUL.getElementsByTagName('li'),
-                    currentChild = {};
+        for (var ulTab in tabULContent) {
+            if (ulTab === selectedTab.selected) {
+                if (tabULContent.hasOwnProperty(ulTab)) {
+                    // Get ID of selected link
+                    var selectedID   = tabULContent[ulTab].id,
+                        mainUL       = Utils.GetElementID(selectedID),
+                        liChildes    = mainUL.getElementsByTagName('li'),
+                        toogle       = Utils.HasClass(mainUL, 'tabDropdownHide') ? true : false,
+                        currentChild = {},
+                        currentChildUL;
 
-                var toogle = Utils.HasClass(mainUL, 'tabDropdownHide') ? true : false;
-                if (toogle) {
-                    Utils.RemoveClassWithName(mainUL, 'tabDropdownHide');
-                    Utils.AddClass(mainUL, 'tabDropdownShow');
-                }
-                else if (!toogle) {
-                    Utils.RemoveClassWithName(mainUL, 'tabDropdownShow');
-                    Utils.AddClass(mainUL, 'tabDropdownHide');
-                }
+                    // Show or hide ul on action
+                    toogle
+                        ? (Utils.RemoveClassWithName(mainUL, 'tabDropdownHide'),
+                        Utils.AddClass(mainUL, 'tabDropdownShow'))
+                        : (Utils.RemoveClassWithName(mainUL, 'tabDropdownShow'),
+                        Utils.AddClass(mainUL, 'tabDropdownHide'));
 
-                // Check for child elements of li
-                for (var i = 0; i < liChildes.length; i++) {
-                    currentChild       = liChildes[i];
-                    var currentChildUL = method.GetFirstChildWithTagName(currentChild, 'ul');
+                    // Check for child elements of li
+                    for (var i = 0; i < liChildes.length; i++) {
+                        currentChild   = liChildes[i];
+                        currentChildUL = method.GetFirstChildWithTagName(currentChild, 'ul');
 
-                    if (currentChildUL) {
-                        Utils.AddClass(currentChildUL, 'ulHide');
-                        currentChild.addEventListener(settings.showChildOn, function () {
-                            var childToogle = Utils.HasClass(this.firstElementChild, 'ulHide') ? true : false;
-                            if (childToogle) {
-                                Utils.RemoveClassWithName(this.firstElementChild, 'ulHide');
-                                Utils.AddClass(this.firstElementChild, 'ulShow');
-                            }
-                            else if (!childToogle) {
-                                Utils.RemoveClassWithName(this.firstElementChild, 'ulShow');
-                                Utils.AddClass(this.firstElementChild, 'ulHide');
-                            }
-                        });
+                        if (currentChildUL !== undefined) {
+                            Utils.AddClass(currentChildUL, 'ulHide');
+
+                            currentChild.addEventListener(settings.showChildOn, function () {
+                                var childToogle = Utils.HasClass(this.firstElementChild, 'ulHide') ? true : false;
+                                if (childToogle) {
+                                    Utils.RemoveClassWithName(this.firstElementChild, 'ulHide');
+                                    Utils.AddClass(this.firstElementChild, 'ulShow');
+                                }
+                                else if (!childToogle) {
+                                    Utils.RemoveClassWithName(this.firstElementChild, 'ulShow');
+                                    Utils.AddClass(this.firstElementChild, 'ulHide');
+                                }
+                            });
+                        }
                     }
                 }
             }
         }
-
     };
 
-    // Initialize default and inactive tabs
-    method.SetTabStyle = function () {
+    // Initialize tabs style, default tab, inactive tab
+    method.SetTabStyle = function (tabTitle, tabTitleLower, tabID, tabIndex) {
+
         // Hides all tabs content at the start
-        if (currentTab.content) {
-            Utils.AddClass(tabContentArray[currentTab.label], 'tabContentHide');
+        currentTab.isUL ? Utils.AddClass(tabULContent[tabTitleLower], 'tabDropdownHide') :
+            Utils.AddClass(tabHTMLContent[tabTitleLower], 'tabContentHide');
+
+        // Set style for default tab
+        if (tabTitle === settings.defaultTab) {
+            Utils.RemoveClassAttribute(tabLinksArray[tabTitleLower]);
+            Utils.RemoveClassAttribute(tabHTMLContent[tabTitleLower]);
+
+            Utils.AddClass(tabLinksArray[tabTitleLower], 'selected');
+            Utils.AddClass(tabHTMLContent[tabTitleLower], 'tabContent');
         }
 
-        if ((currentTab.label === settings.defaultTab) && !currentTab.inactive) {
-            Utils.RemoveClassAttribute(tabLinksArray[settings.defaultTab]);
-            Utils.RemoveClassAttribute(tabContentArray[settings.defaultTab]);
-
-            Utils.AddClass(tabLinksArray[settings.defaultTab], 'selected');
-            Utils.AddClass(tabContentArray[settings.defaultTab], 'tabContent');
-        }
-
+        // Set style for inactive tab
         if (currentTab.inactive) {
-            Utils.RemoveClassAttribute(tabLinksArray[currentTab.label]);
-            Utils.RemoveClassAttribute(tabContentArray[currentTab.label]);
+            Utils.RemoveClassAttribute(tabLinksArray[tabTitleLower]);
+            Utils.RemoveClassAttribute(tabHTMLContent[tabTitleLower]);
 
-            Utils.AddClass(tabLinksArray[currentTab.label], 'inactiveLink');
-            Utils.AddClass(tabContentArray[currentTab.label], 'tabContentHide');
-        }
-        if (currentTab.isUL) {
-            Utils.RemoveClassAttribute(Utils.GetElementID(currentTab.label));
-            Utils.AddClass(Utils.GetElementID(currentTab.label), 'tabDropdownHide');
+            Utils.AddClass(tabLinksArray[tabTitleLower], 'inactiveLink');
+            Utils.AddClass(tabHTMLContent[tabTitleLower], 'tabContentHide');
         }
 
         Utils.AddClass(tabLIArray[tabIndex], 'tabsLiElement');
@@ -234,9 +237,10 @@ var Tabs = (function () {
             elem = evt.target;
         }
         return {
-            selected: elem.innerText
-        }
+            selected: elem.innerText.toLowerCase().toString()
+        };
     };
+
 
     return method;
 }());

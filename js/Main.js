@@ -1,61 +1,63 @@
 function MainInit() {
-    var statusContent = Utils.GetElementID('statusContent'),
-        photosContent = Utils.GetElementID('photosContent'),
-        videoContent  = Utils.GetElementID('videoContent'),
-        audioContent  = Utils.GetElementID('audioContent'),
-        ulContent     = Utils.GetElementID('ulContent'),
-        appendTo      = Utils.GetElementID('tabsContainer'),
-        tabWithLink   = Utils.GetElementID('tabWithLink');
+    var statusContent      = Utils.GetElementID('statusContent'),
+        photosContent      = Utils.GetElementID('photosContent'),
+        videoContent       = Utils.GetElementID('videoContent'),
+        audioContent       = Utils.GetElementID('audioContent'),
+        ulContent          = Utils.GetElementID('ulcontent'),
+        tadijaContent      = Utils.GetElementID('onemoretab'),
+        tabwithlinkContent = Utils.GetElementID('tabwithlink'),
+        appendTo           = Utils.GetElementID('tabsContainer'),
+        tabWithLink        = Utils.GetElementID('tabWithLink');
 
 
     Tabs.Init({
         appendTo   : appendTo,
         before     : appendTo.childNodes[0],
         // If default tab is not present all tabs content will be hidden and showed upon tab click
-        defaultTab : 'audio',
+        defaultTab : 'Status Tab',
         position   : 'relative',
         display    : 'inline',
         showHTMLOn : 'click',
         showULOn   : 'mouseover',
         hideULOn   : 'mouseout',
         showChildOn: 'mouseover',
+        hideChildOn: 'mouseout',
         tabs       : [
             {
-                label  : 'status',
+                label  : 'Status Tab',
                 href   : '#status',
-                content: statusContent,
+                content: statusContent
             },
             {
-                label   : 'photos',
+                label   : 'Photos Tab',
                 href    : '#photos',
                 content : photosContent,
                 inactive: true
             }, {
-                label  : 'video',
+                label  : 'Video Tab',
                 href   : '#video',
                 content: videoContent
             }, {
-                label  : 'audio',
+                label  : 'Audio Tab',
                 href   : '#audio',
                 content: audioContent
             }, {
-                label: 'ulcontent',
-                href : '#ulcontent',
-                isUL : true
+                label  : 'Some Ul Content',
+                href   : '#ulcontent',
+                content: ulContent,
+                isUL   : true
             }, {
-                label: 'tadijacontent',
-                href : '#tadijacontent',
-                isUL : true
+                label   : 'Tadija Tab',
+                href    : '#tadijacontent',
+                content : tadijaContent,
+                isUL    : true,
+                inactive: true
             },
             {
-                label: 'onemoretab',
-                href : '#onemoretab',
-                isUL : true
-            },
-            {
-                label: 'tabwithlink',
-                href : '#tabwithlink',
-                isUL : true
+                label  : 'tabwithlink',
+                href   : '#tabwithlink',
+                content: tabwithlinkContent,
+                isUL   : true
             }
         ]
     });

@@ -68,7 +68,7 @@ var Utils = (function () {
     method.IsObjectEmpty = function(obj) {
 
         // null and undefined are "empty"
-        if (obj == null) return true;
+        if (obj === null) return true;
 
         // Assume if it has a length property with a non-zero value
         // that that property is correct.
@@ -86,7 +86,7 @@ var Utils = (function () {
     };
 
     method.IsNullOrDefault = function (value, defaultValue) {
-        return value != '' ? value : defaultValue;
+        return value !== '' ? value : defaultValue;
     };
 
     method.SetStyle = function (el, style) {
