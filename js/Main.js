@@ -7,21 +7,22 @@ function MainInit() {
         tadijaContent      = Utils.GetElementID('onemoretab'),
         tabwithlinkContent = Utils.GetElementID('tabwithlink'),
         appendTo           = Utils.GetElementID('tabsContainer'),
-        tabWithLink        = Utils.GetElementID('tabWithLink');
+        tabWithLink        = Utils.GetElementID('tabWithLink'),
+        testTab            = Utils.GetElementID('testtab');
 
 
     Tabs.Init({
         appendTo   : appendTo,
         before     : appendTo.childNodes[0],
         // If default tab is not present all tabs content will be hidden and showed upon tab click
-        defaultTab : 'Status Tab',
+        active     : 'Status Tab',
         position   : 'relative',
         display    : 'inline',
         showHTMLOn : 'click',
         showULOn   : 'mouseover',
         hideULOn   : 'mouseout',
         showChildOn: 'mouseover',
-        hideChildOn: 'mouseout',
+        hideChildOn: 'mouseover',
         tabs       : [
             {
                 label  : 'Status Tab',
@@ -60,6 +61,20 @@ function MainInit() {
                 isUL   : true
             }
         ]
+    });
+
+    Tabs.AppendTab({
+//        label   : '',
+//        href    : '#tadija',
+////        content : testTab,
+//        isUL    : false,
+//        inactive: false,
+//        id      : 'testtab'
+    });
+
+    Tabs.RemoveTab({
+        label : 'Jos Jedan Tab!',
+        remove: true
     });
 
 }

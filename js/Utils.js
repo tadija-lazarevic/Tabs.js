@@ -65,7 +65,7 @@ var Utils = (function () {
         if (el.className !== '') el.className = '';
     };
 
-    method.IsObjectEmpty = function(obj) {
+    method.IsObjectEmpty = function (obj) {
 
         // null and undefined are "empty"
         if (obj === null) return true;
@@ -86,11 +86,15 @@ var Utils = (function () {
     };
 
     method.IsNullOrDefault = function (value, defaultValue) {
-        return value !== '' ? value : defaultValue;
+        return value === '' || 'undefined' || null ? value : defaultValue;
+    };
+
+    method.IsUndefiendOrDefault = function (value, defaultValue) {
+        return typeof  value === 'undefined' ? defaultValue : value;
     };
 
     method.SetStyle = function (el, style) {
-      el.style = style;
+        el.style = style;
     };
 
     Array.prototype.unique = function () {

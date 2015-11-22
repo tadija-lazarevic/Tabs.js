@@ -33,9 +33,12 @@ li.tabsLiElement {
 }
 .tabDropdownHide ul{
     display: none;
+
+
 }
 .tabDropdownShow {
     display: inline-block;
+    padding-left: 500px;
 }
 .dropdownShow ul{
     display: block;
