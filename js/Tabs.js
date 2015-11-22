@@ -28,10 +28,8 @@ var Tabs = (function () {
                 href    : '#newtab',
                 inactive: false,
                 isUL    : false,
-                id      : 'newtab' + idPostfix,
-                content : '<div id="newtab">' +
-                '<h1>Example tab content</h1>' +
-                '</div>'
+                id      : 'newtabID',
+                content : document.createElement('h1').innerHTML = 'Example tab content'
             }
         };
 
@@ -102,7 +100,7 @@ var Tabs = (function () {
         // Gets tabs child nodes
         tabLIArray = Utils.GetElementID('tabs').childNodes;
 
-        aTag  = method.GetFirstChildWithTagName(tabLIArray[currentTab.tabIndex], 'a');
+        aTag                                    = method.GetFirstChildWithTagName(tabLIArray[currentTab.tabIndex], 'a');
         tabLinksArray[currentTab.tabTitleLower] = aTag;
         currentTab.content ? tabHTMLContent[currentTab.tabTitleLower] = currentTab.content : null;
         currentTab.isUL ? tabULContent[currentTab.tabTitleLower] = currentTab.content : null;
@@ -259,18 +257,35 @@ var Tabs = (function () {
         currentTab.tabTitleLower = currentTab.tabTitle.toLowerCase();
         currentTab.tabID         = currentTab.tabTitleLower.replace(/\s+/g, '') + idPostfix;
         currentTab.tabHref       = newTab.href.toLowerCase();
-        currentTab.tabIndex      = settings.tabs.length++;
+        currentTab.tabIndex      = settings.tabs.length;
 
+        //Do some stuff for new tab, create link, get content and set styling
         method.CreateLinks(currentTab);
         method.GetContent(currentTab);
         method.SetTabStyle(currentTab);
 
+        // Add new tab to tabs array
+        settings.tabs.push(newTab);
+
     };
 
+    // Remove tab by id
     method.RemoveTab = function (parametars) {
-        if (currentTab.remove) {
-            tabLinksArray[parametars.tabTitleLower] = '';
-            tabHTMLContent[parametars.tabTitleLower]
+        if (parametars.id) {
+            var removeIDParam = parametars.id,
+                removeTab     = {},
+                index         = 0;
+
+            for (var i = 0; i < settings.tabs.length; i++) {
+                removeTab = settings.tabs[i];
+                if (removeIDParam === removeTab.tabID) {
+                    index = removeTab.tabIndex;
+                    settings.tabs.splice(index, 1);
+                }
+            }
+        }
+        else {
+            alert('You must enter id of tab which you want to delete!');
         }
     };
 

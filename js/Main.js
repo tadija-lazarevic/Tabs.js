@@ -8,8 +8,19 @@ function MainInit() {
         tabwithlinkContent = Utils.GetElementID('tabwithlink'),
         appendTo           = Utils.GetElementID('tabsContainer'),
         tabWithLink        = Utils.GetElementID('tabWithLink'),
-        testTab            = Utils.GetElementID('testtab');
+        testTab            = Utils.GetElementID('testTab');
 
+
+    var statusTab   = {label: 'Status Tab', href: '#status', content: statusContent};
+    var photosTab   = {label: 'Photos Tab', href: '#photos', content: photosContent, inactive: true};
+    var videoTab    = {label: 'Video Tab', href: '#video', content: videoContent};
+    var audioTab    = {label: 'Audio Tab', href: '#audio', content: audioContent};
+    var firstULTab  = {label: 'Some Ul Content', href: '#ulcontent', content: ulContent, isUL: true};
+    var secondULTab = {label: 'Tadija Tab', href: '#tadijacontent', content: tadijaContent, isUL: true, inactive: true};
+    var thirdULTab  = {label: 'tabwithlink', href: '#tabwithlink', content: tabwithlinkContent, isUL: true};
+
+    var tabs = [];
+    tabs.push(statusTab, photosTab, videoTab, audioTab, firstULTab, secondULTab, thirdULTab);
 
     Tabs.Init({
         appendTo   : appendTo,
@@ -23,58 +34,20 @@ function MainInit() {
         hideULOn   : 'mouseout',
         showChildOn: 'mouseover',
         hideChildOn: 'mouseover',
-        tabs       : [
-            {
-                label  : 'Status Tab',
-                href   : '#status',
-                content: statusContent
-            },
-            {
-                label   : 'Photos Tab',
-                href    : '#photos',
-                content : photosContent,
-                inactive: true
-            }, {
-                label  : 'Video Tab',
-                href   : '#video',
-                content: videoContent
-            }, {
-                label  : 'Audio Tab',
-                href   : '#audio',
-                content: audioContent
-            }, {
-                label  : 'Some Ul Content',
-                href   : '#ulcontent',
-                content: ulContent,
-                isUL   : true
-            }, {
-                label   : 'Tadija Tab',
-                href    : '#tadijacontent',
-                content : tadijaContent,
-                isUL    : true,
-                inactive: true
-            },
-            {
-                label  : 'tabwithlink',
-                href   : '#tabwithlink',
-                content: tabwithlinkContent,
-                isUL   : true
-            }
-        ]
+        tabs       : tabs
     });
 
     Tabs.AppendTab({
-//        label   : '',
-//        href    : '#tadija',
-////        content : testTab,
-//        isUL    : false,
-//        inactive: false,
-//        id      : 'testtab'
+        label   : 'Test Tab',
+        href    : '#tadija',
+        content : testTab,
+        isUL    : false,
+        inactive: false,
+        id      : 'testtab'
     });
 
     Tabs.RemoveTab({
-        label : 'Jos Jedan Tab!',
-        remove: true
+        id: 'tabwithlinkID'
     });
 
 }
