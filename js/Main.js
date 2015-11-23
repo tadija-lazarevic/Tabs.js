@@ -6,7 +6,6 @@ function MainInit() {
         ulContent          = Utils.GetElementID('ulcontent'),
         tadijaContent      = Utils.GetElementID('onemoretab'),
         tabwithlinkContent = Utils.GetElementID('tabwithlink'),
-        appendTo           = Utils.GetElementID('tabsContainer'),
         tabWithLink        = Utils.GetElementID('tabWithLink'),
         testTab            = Utils.GetElementID('testTab');
 
@@ -17,37 +16,28 @@ function MainInit() {
     var audioTab    = {label: 'Audio Tab', href: '#audio', content: audioContent};
     var firstULTab  = {label: 'Some Ul Content', href: '#ulcontent', content: ulContent, isUL: true};
     var secondULTab = {label: 'Tadija Tab', href: '#tadijacontent', content: tadijaContent, isUL: true, inactive: true};
-    var thirdULTab  = {label: 'tabwithlink', href: '#tabwithlink', content: tabwithlinkContent, isUL: true};
+    var thirdULTab  = {label: 'Tab With Link', href: '#tabwithlink', content: tabwithlinkContent, isUL: true};
+    var duskoTab    = {label: 'Dusko Tab', href: '#duskotab', content: testTab};
+    var gagana      = {label: 'Gagana', href: '#gagana', content: audioContent};
+
 
     var tabs = [];
     tabs.push(statusTab, photosTab, videoTab, audioTab, firstULTab, secondULTab, thirdULTab);
 
-    Tabs.Init({
-        appendTo   : appendTo,
-        before     : appendTo.childNodes[0],
-        // If default tab is not present all tabs content will be hidden and showed upon tab click
-        active     : 'Status Tab',
-        position   : 'relative',
-        display    : 'inline',
-        showHTMLOn : 'click',
-        showULOn   : 'mouseover',
-        hideULOn   : 'mouseout',
-        showChildOn: 'mouseover',
-        hideChildOn: 'mouseover',
-        tabs       : tabs
-    });
+    var settings = {active: 'Status Tab', position: 'relative', display: 'inline', tabs: tabs};
 
-    Tabs.AppendTab({
-        label   : 'Test Tab',
-        href    : '#tadija',
-        content : testTab,
-        isUL    : false,
-        inactive: false,
-        id      : 'testtab'
-    });
 
-    Tabs.RemoveTab({
-        id: 'tabwithlinkID'
-    });
+    // Init method
+    Tabs.Init(settings);
+
+    // Add new tab
+    Tabs.AppendTab(duskoTab);
+
+    // Removing
+    Tabs.RemoveTab(duskoTab);
+    Tabs.RemoveTab(thirdULTab);
+    Tabs.AppendTab(thirdULTab);
+    Tabs.RemoveTab(statusTab);
+
 
 }

@@ -17,13 +17,18 @@ var Tabs = (function () {
 
 
         defaultSettings = {
-            appendTo  : document.body,
-            before    : document.body.children[0],
-            position  : 'fixed',
-            active    : '',
-            display   : 'block',
-            tabs      : [],
-            defaultTab: {
+            appendTo   : document.body,
+            before     : document.body.children[0],
+            position   : 'fixed',
+            active     : '',
+            display    : 'block',
+            tabs       : [],
+            showHTMLOn : 'click',
+            showULOn   : 'click',
+            hideULOn   : 'click',
+            showChildOn: 'click',
+            hideChildOn: 'click',
+            defaultTab : {
                 label   : 'new tab',
                 href    : '#newtab',
                 inactive: false,
@@ -271,21 +276,24 @@ var Tabs = (function () {
 
     // Remove tab by id
     method.RemoveTab = function (parametars) {
-        if (parametars.id) {
-            var removeIDParam = parametars.id,
-                removeTab     = {},
-                index         = 0;
+        if (parametars) {
+            var removeLabel = parametars.label,
+                removeTab   = {},
+                index       = 0;
 
             for (var i = 0; i < settings.tabs.length; i++) {
                 removeTab = settings.tabs[i];
-                if (removeIDParam === removeTab.tabID) {
+                if (removeLabel === removeTab.label) {
                     index = removeTab.tabIndex;
-                    settings.tabs.splice(index, 1);
+                    if (index > -1) {
+                        // Remove element from tabs array
+                        settings.tabs.splice(index, 1);
+                        // Remove link from links array
+                        tabLIArray[index].outerHTML = '';
+                    }
                 }
+
             }
-        }
-        else {
-            alert('You must enter id of tab which you want to delete!');
         }
     };
 
