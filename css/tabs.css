@@ -31,21 +31,17 @@ li.tabsLiElement {
     cursor: default;
     background-color: transparent;
 }
-.tabDropdownHide ul{
+.tabDropdownHide ul {
     display: none;
 }
-.tabDropdownShow {
+.tabDropdownShow ul {
     display: block;
-
-}
-.dropdownShow ul{
-    display: block;
-}
-.ulHide {
-    display: none;
-}
-.ulShow {
-    display: block;
+    color: #D41304;
+    float: left;
+    background: #4B4B4B;
+    position: relative;
+    z-index: 500;
+    margin: 0 1px;
 }
 .separator {
     border-top:solid 1px #CACF75;
