@@ -1,7 +1,5 @@
 .tabs {
     list-style-type: none;
-    margin: 30px 0 0 0;
-    padding: 0 0 2em 0;
 }
 li.tabsLiElement {
     margin-right: 35px;
@@ -30,21 +28,4 @@ li.tabsLiElement {
     pointer-events: none;
     cursor: default;
     background-color: transparent;
-}
-.tabDropdownHide ul {
-    display: none;
-}
-.tabDropdownShow ul {
-    display: block;
-    color: #D41304;
-    float: left;
-    background: #4B4B4B;
-    position: relative;
-    z-index: 500;
-    margin: 0 1px;
-}
-.separator {
-    border-top:solid 1px #CACF75;
-    padding-top:1px;
-    height:	1px;
 }
