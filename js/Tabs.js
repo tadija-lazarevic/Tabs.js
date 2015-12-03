@@ -3,7 +3,7 @@ var Tabs = (function () {
 
     // Private fields
     var tabULContainer  = document.createElement('ul'),
-        tabHTMLContent  = [],
+        tabContent      = [],
         tabLinksArray   = [],
         tabLIArray      = [],
         idPostfix       = 'ID',
@@ -53,9 +53,9 @@ var Tabs = (function () {
         // Gets tabs child nodes
         tabLIArray = Utils.GetElementID(settings.ulID).childNodes;
 
-        aTag = GetFirstChildWithTagName(tabLIArray[currentTab.tabIndex], 'a');
+        aTag                                    = GetFirstChildWithTagName(tabLIArray[currentTab.tabIndex], 'a');
         tabLinksArray[currentTab.tabTitleLower] = aTag;
-        currentTab.content ? tabHTMLContent[currentTab.tabTitleLower] = currentTab.content : null;
+        currentTab.content ? tabContent[currentTab.tabTitleLower] = currentTab.content : null;
 
         // On tab action
         if (tabLinksArray.hasOwnProperty(currentTab.tabTitleLower) && !currentTab.inactive) {
@@ -69,20 +69,20 @@ var Tabs = (function () {
         // Gets the name of selected tab
         var selectedTab = ReturnSelected();
 
-        for (var id in tabHTMLContent) {
+        for (var id in tabContent) {
             if (id === selectedTab.selected) {
-                if (tabHTMLContent.hasOwnProperty(id)) {
+                if (tabContent.hasOwnProperty(id)) {
                     Utils.RemoveClassAttribute(tabLinksArray[id]);
-                    Utils.RemoveClassAttribute(tabHTMLContent[id]);
+                    Utils.RemoveClassAttribute(tabContent[id]);
 
                     Utils.AddClass(tabLinksArray[id], 'selected');
-                    Utils.AddClass(tabHTMLContent[id], 'tabContent');
+                    Utils.AddClass(tabContent[id], 'tabContent');
                 }
             }
             else {
-                if (tabHTMLContent.hasOwnProperty(id)) {
+                if (tabContent.hasOwnProperty(id)) {
                     Utils.RemoveClassWithName(tabLinksArray[id], 'selected');
-                    Utils.AddClass(tabHTMLContent[id], 'tabContentHide');
+                    Utils.AddClass(tabContent[id], 'tabContentHide');
                 }
             }
         }
@@ -91,25 +91,25 @@ var Tabs = (function () {
     function SetTabStyle() {
         // Hides all tabs content at the start
         if (currentTab.content) {
-            Utils.AddClass(tabHTMLContent[currentTab.tabTitleLower], 'tabContentHide');
+            Utils.AddClass(tabContent[currentTab.tabTitleLower], 'tabContentHide');
         }
 
         // Set style for default tab
         if (currentTab.tabTitle === settings.active) {
             Utils.RemoveClassAttribute(tabLinksArray[currentTab.tabTitleLower]);
-            Utils.RemoveClassAttribute(tabHTMLContent[currentTab.tabTitleLower]);
+            Utils.RemoveClassAttribute(tabContent[currentTab.tabTitleLower]);
 
             Utils.AddClass(tabLinksArray[currentTab.tabTitleLower], 'selected');
-            Utils.AddClass(tabHTMLContent[currentTab.tabTitleLower], 'tabContent');
+            Utils.AddClass(tabContent[currentTab.tabTitleLower], 'tabContent');
         }
 
         // Set style for inactive tab
         if (currentTab.inactive) {
             Utils.RemoveClassAttribute(tabLinksArray[currentTab.tabTitleLower]);
-            Utils.RemoveClassAttribute(tabHTMLContent[currentTab.tabTitleLower]);
+            Utils.RemoveClassAttribute(tabContent[currentTab.tabTitleLower]);
 
             Utils.AddClass(tabLinksArray[currentTab.tabTitleLower], 'inactiveLink');
-            Utils.AddClass(tabHTMLContent[currentTab.tabTitleLower], 'tabContentHide');
+            Utils.AddClass(tabContent[currentTab.tabTitleLower], 'tabContentHide');
         }
 
         Utils.AddClass(tabLIArray[currentTab.tabIndex], 'tabsLiElement');
@@ -137,7 +137,7 @@ var Tabs = (function () {
         };
     }
 
-    // Public methods
+    // Public API
     return {
 
         Init: function (parameters) {
@@ -183,52 +183,60 @@ var Tabs = (function () {
         },
 
         AppendTab: function (params) {
-            var newTab = {
-                label   : params.label || defaultSettings.defaultTab.label,
-                href    : params.href || defaultSettings.defaultTab.href,
-                content : params.content || defaultSettings.defaultTab.content,
-                isUL    : params.isUL || defaultSettings.defaultTab.isUL,
-                inactive: params.inactive || defaultSettings.defaultTab.inactive,
-                id      : params.id + idPostfix || defaultSettings.defaultTab.id
-            };
+            if (!params.label || !params.content) {
+                alert('New tab must have label and content!');
+            }
+            else {
+                var newTab = {
+                    label   : params.label || defaultSettings.defaultTab.label,
+                    href    : params.href || defaultSettings.defaultTab.href,
+                    content : params.content || defaultSettings.defaultTab.content,
+                    isUL    : params.isUL || defaultSettings.defaultTab.isUL,
+                    inactive: params.inactive || defaultSettings.defaultTab.inactive,
+                    id      : params.id + idPostfix || defaultSettings.defaultTab.id
+                };
 
-            currentTab               = newTab;
-            currentTab.tabTitle      = newTab.label;
-            currentTab.tabTitleLower = currentTab.tabTitle.toLowerCase();
-            currentTab.tabID         = currentTab.tabTitleLower.replace(/\s+/g, '') + idPostfix;
-            currentTab.tabHref       = newTab.href.toLowerCase();
-            currentTab.tabIndex      = settings.tabs.length;
+                currentTab               = newTab;
+                currentTab.tabTitle      = newTab.label;
+                currentTab.tabTitleLower = currentTab.tabTitle.toLowerCase();
+                currentTab.tabID         = currentTab.tabTitleLower.replace(/\s+/g, '') + idPostfix;
+                currentTab.tabHref       = newTab.href.toLowerCase();
+                currentTab.tabIndex      = settings.tabs.length;
 
-            //Do some stuff for new tab, create link, get content and set styling
-            CreateLinks(currentTab);
-            GetContent(currentTab);
-            SetTabStyle(currentTab);
+                //Do some stuff for new tab, create link, get content and set styling
+                CreateLinks(currentTab);
+                GetContent(currentTab);
+                SetTabStyle(currentTab);
 
-            // Add new tab to tabs array
-            settings.tabs.push(newTab);
+                // Add new tab to tabs array
+                settings.tabs.push(newTab);
+            }
+
+
         },
 
         RemoveTab: function (params) {
-            if (params) {
+            if (!params.label) {
+                alert('To remove tab you must provide its label!');
+            }
+            else {
                 var removeLabel = params.label,
-                    removeTab   = {},
-                    index       = 0;
+                    removeTab   = {};
 
                 for (var i = 0; i < settings.tabs.length; i++) {
                     removeTab = settings.tabs[i];
                     if (removeLabel === removeTab.label) {
-                        index = removeTab.tabIndex;
-                        if (index > -1) {
-                            // Remove element from tabs array
-                            settings.tabs.splice(index, 1);
-                            // Remove link from links array
-                            tabLIArray[index].remove();
+                        if (removeTab.tabIndex > -1) {
+                            // Remove tab content, link and li element
+                            settings.tabs.splice(removeTab.tabIndex, 1);
+                            tabLIArray[removeTab.tabIndex].remove();
+                            tabContent[removeTab.label.toLowerCase()].remove();
+                            tabLinksArray[removeTab.label.toLowerCase()].remove();
                         }
                     }
-
                 }
             }
-        },
+        }
 
     };
 

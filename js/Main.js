@@ -15,4 +15,6 @@ function MainInit() {
         tabs    : accorditionArray
     };
     tabs.Init(accorditionSettings);
+    tabs.RemoveTab({label: 'Finances Tab'});
+
 }
